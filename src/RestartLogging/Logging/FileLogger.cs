@@ -85,12 +85,12 @@ namespace RestartLogging.Logging
             public ScopeWriter(FileLogger logger, object state)
             {
                 _logger = logger;
-                _logger.Write(state);
+                _logger.Write(state + " Start");
                 _state = state;
             }
             public void Dispose()
             {
-                _logger.Write(_state);
+                _logger.Write(_state + " End");
             }
         }
 
