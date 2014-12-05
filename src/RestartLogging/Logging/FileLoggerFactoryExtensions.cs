@@ -15,7 +15,7 @@ namespace Microsoft.Framework.Logging
             filter = filter ?? DefaultFilter;
 
             var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 1024, false);
-            var writer = new StreamWriter(stream, Encoding.ASCII);
+            var writer = new StreamWriter(stream, Encoding.UTF8);
 
             factory.AddProvider(
                 new FileLoggerProvider(writer, (category, logLevel) => category == "timing"));

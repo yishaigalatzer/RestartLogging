@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Combiner
 {
@@ -8,7 +9,7 @@ namespace Combiner
         public static void Write(List<Entry> entries, string outputFileName)
         {
             using (var ostream = File.OpenWrite(outputFileName))
-            using (var writer = new StreamWriter(ostream))
+            using (var writer = new StreamWriter(ostream, Encoding.UTF8))
             {
                 foreach (var entry in entries)
                 {

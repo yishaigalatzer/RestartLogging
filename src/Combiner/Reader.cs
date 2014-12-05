@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Combiner
 {
@@ -12,7 +13,7 @@ namespace Combiner
         {
             var entries = new List<Entry>();
 
-            var lines = File.ReadAllLines(filePath);
+            var lines = File.ReadAllLines(filePath, Encoding.UTF8);
 
             for (int lineNumber = 0; lineNumber < lines.Length; lineNumber++)
             {
