@@ -27,8 +27,7 @@ namespace RestartLogging.Migrations
                 {
                     b.Property<string>("ClaimType");
                     b.Property<string>("ClaimValue");
-                    b.Property<int>("Id")
-                        .GenerateValuesOnAdd();
+                    b.Property<int>("Id").GenerateValueOnAdd();
                     b.Property<string>("RoleId");
                     b.Key("Id");
                     b.ForRelational().Table("AspNetRoleClaims");
@@ -38,8 +37,7 @@ namespace RestartLogging.Migrations
                 {
                     b.Property<string>("ClaimType");
                     b.Property<string>("ClaimValue");
-                    b.Property<int>("Id")
-                        .GenerateValuesOnAdd();
+                    b.Property<int>("Id").GenerateValueOnAdd();
                     b.Property<string>("UserId");
                     b.Key("Id");
                     b.ForRelational().Table("AspNetUserClaims");

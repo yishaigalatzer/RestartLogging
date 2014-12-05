@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Security.Cookies;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Logging.Console;
+using Microsoft.Framework.Runtime;
+using RestartLogging.Logging;
 using RestartLogging.Models;
 
 namespace RestartLogging
@@ -35,36 +38,49 @@ namespace RestartLogging
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add EF services to the services container.
-            services.AddEntityFramework(Configuration)
-                .AddSqlServer()
-                .AddDbContext<ApplicationDbContext>();
+            //// Add EF services to the services container.
+            //services.AddEntityFramework(Configuration)
+            //    .AddSqlServer()
+            //    .AddDbContext<ApplicationDbContext>();
 
-            //// Add Identity services to the services container.
-            services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration);
+            ////// Add Identity services to the services container.
+            //services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration);
 
             // Add MVC services to the services container.
             services.AddMvc();
-
+             
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
 
         }
 
+        public static DateTime ThisRequestStart { get; set; }
+        public static ILogger TimingLogger { get; set; }
+
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory, IApplicationEnvironment appEnv)
         {
+            var folderPath = Path.Combine(
+                Path.GetTempPath(),
+                "ProjectKLogs");
+
+            Directory.CreateDirectory(folderPath);
+
+            loggerfactory.AddFile(Path.Combine(folderPath, appEnv.ApplicationName) + ".app.log");
+
+            app.Use(async (ctx, next) =>
+            {
+                ThisRequestStart = DateTime.Now;
+                await next();
+            });
+
             // Configure the HTTP request pipeline.
             // Add the console logger. 
-            var logger = loggerfactory.Create<Startup>();
-            {
-                using (var scope = logger.BeginScope("Startup"))
-                if (logger.IsEnabled(TraceType.Verbose))
-                {
-                    logger.WriteVerbose("something");
-                }
+            TimingLogger = loggerfactory.Create("timing");
 
+            using (var scope = TimingLogger.BeginScope("startup"))
+            {
                 // Add the following to the request pipeline only in development environment.
                 if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
                 {
@@ -88,6 +104,8 @@ namespace RestartLogging
                 // Add MVC to the request pipeline.
                 app.UseMvc(routes =>
                 {
+                    routes.DefaultHandler = new LoggingRouter(routes.DefaultHandler, TimingLogger);
+
                     routes.MapRoute(
                         name: "default",
                         template: "{controller}/{action}/{id?}",

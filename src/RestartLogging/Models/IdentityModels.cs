@@ -24,7 +24,7 @@ namespace RestartLogging.Models
             // are supported in ASP.NET 5
             if (!_created)
             {
-                Database.AsRelational().ApplyMigrations();
+                //Database.AsRelational().ApplyMigrations();
                 _created = true;
             }
         }
