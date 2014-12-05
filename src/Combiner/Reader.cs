@@ -13,9 +13,22 @@ namespace Combiner
         {
             var entries = new List<Entry>();
 
-            var lines = File.ReadAllLines(filePath, Encoding.UTF8);
+            List<string> lines = new List<string>();
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                string line = string.Empty;
+                while (!reader.EndOfStream)
+                {
+                    line = reader.ReadLine();
+                    if (line != null)
+                    {
+                        lines.Add(line);
+                    }
+                }
+            }
 
-            for (int lineNumber = 0; lineNumber < lines.Length; lineNumber++)
+            for (int lineNumber = 0; lineNumber < lines.Count; lineNumber++)
             {
                 string line = lines[lineNumber];
                 var split = line.Split(new[] { ',' });

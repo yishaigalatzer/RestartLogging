@@ -62,7 +62,6 @@ namespace RestartLogging.Logging
                 return;
             }
 
-            var severity = logLevel.ToString().ToUpperInvariant();
             File.WriteLine("{0}, {1}, {2}", DateTime.Now.ToString("hh:mm:ss:ffff"), "AppLog", message);
             File.Flush();
         }
